@@ -8,7 +8,7 @@ export default async function handler(
   if (req.method == "POST") {
     try {
       const response = await axios.post(
-        "http://localhost:80/user/signup",
+        "http://secure-proj_nginx-proxy_1:80/user/signup",
         req.body
       );
       if (response.data.status) {

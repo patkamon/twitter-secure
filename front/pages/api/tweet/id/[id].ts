@@ -8,7 +8,7 @@ export default async function handler(
   const { id } = req.query;
   if (req.method == "GET") {
     try {
-      const response = await axios.get(`http://localhost:80/tweet/id/${id}`);
+      const response = await axios.get(`http://secure-proj_nginx-proxy_1:80//tweet/id/${id}`);
       return res.status(200).json(response.data);
     } catch (error) {
       console.error(error);

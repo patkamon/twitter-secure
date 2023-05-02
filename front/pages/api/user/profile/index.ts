@@ -8,7 +8,7 @@ export default async function handler(
   if (req.method == "POST") {
     try {
       const response = await axios.post(
-        "http://localhost:80/user/profile",
+        "http://secure-proj_nginx-proxy_1:80/user/profile",
         req.body,
         {
           headers: {
@@ -28,7 +28,7 @@ export default async function handler(
     }
   } else if (req.method == "GET") {
     try {
-      const response = await axios.get("http://localhost:80/user/profile", {
+      const response = await axios.get("http://secure-proj_nginx-proxy_1:80/user/profile", {
         headers: {
           Authorization: req.headers.authorization,
         },

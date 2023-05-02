@@ -8,7 +8,7 @@ export default async function handler(
   const { id } = req.query;
   if (req.method == "DELETE") {
     try {
-      const response = await axios.delete(`http://localhost:80/tweet/${id}`, {
+      const response = await axios.delete(`http://secure-proj_nginx-proxy_1:80/tweet/${id}`, {
         headers: {
           Authorization: req.headers.authorization,
         },
