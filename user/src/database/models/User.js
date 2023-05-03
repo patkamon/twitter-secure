@@ -13,6 +13,8 @@ const UserSchema = new Schema(
     profile: [{ type: Schema.Types.ObjectId, ref: "profile", require: true }],
     tweet: [{ _id: { type: String, require: true } }],
     retweet: [{ _id: { type: String, require: true } }],
+    //added
+    role: String,
   },
   {
     toJSON: {

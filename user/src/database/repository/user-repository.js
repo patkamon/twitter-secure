@@ -3,7 +3,7 @@ const { UserModel, ProfileModel } = require("../models");
 
 //Dealing with data base operations
 class UserRepository {
-  async CreateUser({ email, username, password, phone, salt }) {
+  async CreateUser({ email, username, password, phone, salt, role }) {
     const user = new UserModel({
       email,
       username,
@@ -11,6 +11,7 @@ class UserRepository {
       salt,
       phone,
       profile: [],
+      role,
     });
 
     const userResult = await user.save();

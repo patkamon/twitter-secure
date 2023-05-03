@@ -37,7 +37,7 @@ class UserService {
   }
 
   async SignUp(userInputs) {
-    const { email, username, password, phone } = userInputs;
+    const { email, username, password, phone, role } = userInputs;
 
     // create salt
     let salt = await GenerateSalt();
@@ -62,13 +62,15 @@ class UserService {
       password: userPassword,
       phone,
       salt,
+      role,
     });
 
     const token = await GenerateSignature({
       email: email,
       _id: existingUser._id,
+      role: role,
     });
-    return FormateData({ id: existingUser._id, token });
+    return FormateData({ id: existingUser._id, token, role });
   }
 
   async AddNewAddress(_id, userInputs) {
