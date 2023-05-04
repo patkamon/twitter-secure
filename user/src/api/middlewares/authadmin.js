@@ -2,12 +2,13 @@ const { ValidateSignature, ValidateSignatureAdmin } = require("../../utils");
 const ErrorHandler = require("../../utils/error-handler");
 
 module.exports = async (req, res, next) => {
-  const isAuthorized = await ValidateSignatureAdmin(req);
+  const data = await ValidateSignatureAdmin(req);
 
-  if (isAuthorized) {
+  if (data.verify) {
     return next();
   }
   ErrorHandler({
+    data: data,
     description: "user tried to use admin endpoint",
     name: "Wrong role",
   });

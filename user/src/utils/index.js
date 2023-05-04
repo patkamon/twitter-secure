@@ -54,14 +54,16 @@ module.exports.ValidateSignatureAdmin = async (req) => {
     console.log(signature);
     const payload = await jwt.verify(signature.split(" ")[1], APP_SECRET);
     req.user = payload;
-    if (payload.role == "admin") {
-      return true;
+    if (req.user.role == "admin") {
+      payload.verify = true;
+      return payload;
     }
     console.log("not admin");
-    return false;
+    payload.verify = false;
+    return payload;
   } catch (error) {
     console.log(error);
-    return false;
+    return { verify: false };
   }
 };
 
