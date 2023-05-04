@@ -15,6 +15,7 @@ const UserSchema = new Schema(
     retweet: [{ _id: { type: String, require: true } }],
     //added
     role: String,
+    csrf: String,
   },
   {
     toJSON: {
@@ -22,6 +23,7 @@ const UserSchema = new Schema(
         delete ret.password;
         delete ret.salt;
         delete ret.__v;
+        delete ret.csrf;
       },
     },
     timestamps: true,
