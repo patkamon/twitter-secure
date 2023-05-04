@@ -3,11 +3,17 @@ const { SubscribeMessage } = require("../utils");
 const UserAuth = require("./middlewares/auth");
 const { USER_SERVICE } = require("../config");
 const { PublishMessage } = require("../utils");
+const rateLimit = require("express-rate-limit");
 
 module.exports = (app, channel) => {
   const service = new TweetService();
 
   SubscribeMessage(channel, service);
+
+  const limiter = rateLimit({
+    windowMs: 3000,
+    max: 1,
+  });
 
   app.post("", UserAuth, async (req, res, next) => {
     const { _id } = req.user;
@@ -52,7 +58,7 @@ module.exports = (app, channel) => {
     res.status(200).json(data);
   });
 
-  app.get("/all", async (req, res, next) => {
+  app.get("/all", limiter, async (req, res, next) => {
     const { data } = await service.GetAllTweet();
 
     res.status(200).json(data);

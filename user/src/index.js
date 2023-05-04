@@ -1,32 +1,29 @@
-const express = require('express');
-const { PORT } = require('./config');
-const { databaseConnection } = require('./database');
-const expressApp = require('./express-app');
-const { CreateChannel } = require('./utils')
+const express = require("express");
+const { PORT } = require("./config");
+const { databaseConnection } = require("./database");
+const expressApp = require("./express-app");
+const { CreateChannel } = require("./utils");
 
-const StartServer = async() => {
+const StartServer = async () => {
+  const app = express();
 
-    const app = express();
-    
-    await databaseConnection();
+  await databaseConnection();
 
-    const channel = await CreateChannel()
+  const channel = await CreateChannel();
 
-    await expressApp(app, channel);
-    
+  await expressApp(app, channel);
 
-    app.listen(PORT, () => {
-          console.log(`listening to port ${PORT}`);
+  app
+    .listen(PORT, () => {
+      console.log(`listening to port ${PORT}`);
     })
-    .on('error', (err) => {
-        console.log(err);
-        process.exit();
+    .on("error", (err) => {
+      console.log(err);
+      process.exit();
     })
-    .on('close', () => {
-        channel.close();
-    })
-    
-
-}
+    .on("close", () => {
+      channel.close();
+    });
+};
 
 StartServer();
