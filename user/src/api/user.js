@@ -1,5 +1,6 @@
 const UserService = require("../services/user-service");
 const UserAuth = require("./middlewares/auth");
+const AdminAuth = require("./middlewares/authadmin");
 const { SubscribeMessage } = require("../utils");
 
 module.exports = (app, channel) => {
@@ -9,13 +10,21 @@ module.exports = (app, channel) => {
   SubscribeMessage(channel, service);
 
   app.post("/signup", async (req, res, next) => {
-    const { email, username, password, phone } = req.body;
-    const { data } = await service.SignUp({ email, username, password, phone });
+    const { email, username, password, phone, role } = req.body;
+    const { data } = await service.SignUp({
+      email,
+      username,
+      password,
+      phone,
+      role,
+    });
     res.json(data);
   });
 
   app.post("/login", async (req, res, next) => {
     const { email, password } = req.body;
+
+    console.error("CSRF", req.headers);
 
     const { data } = await service.SignIn({ email, password });
 
@@ -39,11 +48,20 @@ module.exports = (app, channel) => {
 
   app.get("/profile", UserAuth, async (req, res, next) => {
     const { _id } = req.user;
+
+    const _csrf = req.headers.csrf;
+    const verify = await service.CheckCsrf(_id, _csrf);
+    // wrong csrf
+    if (verify.data.status != 200) {
+      return res.json(verify);
+    }
+
     const { data } = await service.GetProfile({ _id });
     res.json(data);
   });
 
-  app.get("/all", async (req, res, next) => {
+  // admin
+  app.get("/all", AdminAuth, async (req, res, next) => {
     const { data } = await service.GetAllUser();
     res.json(data);
   });

@@ -5,7 +5,10 @@ import axios from "axios";
 import PopupForm from "./PopupForm";
 import PopupBio from "./PopupBio";
 
+import cookie from "js-cookie"
+
 const Auth = () => {
+  let  csrf: string;
   const router = useRouter();
   let [logInPopup, setLogInPopup] = useState(false);
   let [createAccPopup, setCreateAccPopup] = useState(false);
@@ -17,6 +20,7 @@ const Auth = () => {
       .get("/api/user/profile", {
         headers: {
           Authorization: "Bearer " + user.token,
+          csrf: cookie.get('csrf')
         },
       })
       .then((response) => {
@@ -28,7 +32,7 @@ const Auth = () => {
       })
       .catch((error) => {
         console.log(error);
-        window.alert(error.response.data.message);
+        window.alert(error.response);
       });
   }
 
@@ -37,6 +41,8 @@ const Auth = () => {
       await axios
         .post("/api/user/login", popupData)
         .then((response) => {
+          cookie.set("csrf", response.data.csrf)
+          csrf = response.data.csrf
           setLogInPopup(false);
           sessionStorage.setItem("user", JSON.stringify(response.data));
           getUserProfile();
@@ -55,6 +61,9 @@ const Auth = () => {
       await axios
         .post("/api/user/signup", popupData)
         .then((response) => {
+          console.log(response)
+          cookie.set("csrf", response.data.csrf)
+          csrf = response.data.csrf
           setCreateAccPopup(false);
           setCreateProfilePopup(true);
           sessionStorage.setItem("user", JSON.stringify(response.data));

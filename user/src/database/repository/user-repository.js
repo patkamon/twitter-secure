@@ -3,7 +3,7 @@ const { UserModel, ProfileModel } = require("../models");
 
 //Dealing with data base operations
 class UserRepository {
-  async CreateUser({ email, username, password, phone, salt }) {
+  async CreateUser({ email, username, password, phone, salt, role, csrf }) {
     const user = new UserModel({
       email,
       username,
@@ -11,6 +11,8 @@ class UserRepository {
       salt,
       phone,
       profile: [],
+      role,
+      csrf,
     });
 
     const userResult = await user.save();
@@ -34,6 +36,22 @@ class UserRepository {
     }
 
     return await profile.save();
+  }
+
+  async UpdateCsrf(_id, csrf) {
+    const profile = await UserModel.findById(_id);
+
+    if (profile) {
+      profile.csrf = csrf;
+    }
+
+    return await profile.save();
+  }
+
+  async GetCsrf(_id) {
+    const profile = await UserModel.findById(_id);
+
+    return profile.csrf;
   }
 
   async FindUser({ email }) {

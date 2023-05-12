@@ -48,6 +48,25 @@ module.exports.ValidateSignature = async (req) => {
   }
 };
 
+module.exports.ValidateSignatureAdmin = async (req) => {
+  try {
+    const signature = req.get("Authorization");
+    console.log(signature);
+    const payload = await jwt.verify(signature.split(" ")[1], APP_SECRET);
+    req.user = payload;
+    if (req.user.role == "admin") {
+      payload.verify = true;
+      return payload;
+    }
+    console.log("not admin");
+    payload.verify = false;
+    return payload;
+  } catch (error) {
+    console.log(error);
+    return { verify: false };
+  }
+};
+
 module.exports.FormateData = (data) => {
   if (data) {
     return { data };
