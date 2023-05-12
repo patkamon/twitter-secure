@@ -24,6 +24,8 @@ module.exports = (app, channel) => {
   app.post("/login", async (req, res, next) => {
     const { email, password } = req.body;
 
+    console.error("CSRF", req.headers);
+
     const { data } = await service.SignIn({ email, password });
 
     res.json(data);
@@ -46,6 +48,14 @@ module.exports = (app, channel) => {
 
   app.get("/profile", UserAuth, async (req, res, next) => {
     const { _id } = req.user;
+
+    const _csrf = req.headers.csrf;
+    const verify = await service.CheckCsrf(_id, _csrf);
+    // wrong csrf
+    if (verify.data.status != 200) {
+      return res.json(verify);
+    }
+
     const { data } = await service.GetProfile({ _id });
     res.json(data);
   });

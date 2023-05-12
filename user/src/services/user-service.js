@@ -28,12 +28,32 @@ class UserService {
         const token = await GenerateSignature({
           email: existingUser.email,
           _id: existingUser._id,
+          role: existingUser.role,
         });
-        return FormateData({ id: existingUser._id, token });
+        //csrf
+        let csrf = await GenerateSalt();
+        // update csrf
+        await this.repository.UpdateCsrf(existingUser._id, csrf);
+
+        return FormateData({ id: existingUser._id, token, csrf });
       }
     }
 
     return FormateData(null);
+  }
+
+  async CheckCsrf(_id, _csrf) {
+    const csrf = await this.repository.GetCsrf(_id);
+    if (_csrf == csrf) {
+      return FormateData({
+        msg: "csrf verified",
+        status: 200,
+      });
+    }
+    return FormateData({
+      msg: "wrong csrf",
+      status: 403,
+    });
   }
 
   async SignUp(userInputs) {
@@ -41,6 +61,9 @@ class UserService {
 
     // create salt
     let salt = await GenerateSalt();
+
+    // create CSRF
+    let csrf = await GenerateSalt();
 
     let userPassword = await GeneratePassword(password, salt);
 
@@ -63,6 +86,7 @@ class UserService {
       phone,
       salt,
       role,
+      csrf,
     });
 
     const token = await GenerateSignature({
@@ -70,7 +94,7 @@ class UserService {
       _id: existingUser._id,
       role: role,
     });
-    return FormateData({ id: existingUser._id, token, role });
+    return FormateData({ id: existingUser._id, token, role, csrf });
   }
 
   async AddNewAddress(_id, userInputs) {

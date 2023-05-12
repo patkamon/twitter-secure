@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
+import cookie from "js-cookie"
+
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,6 +14,8 @@ export default async function handler(
         req.body
       );
       if (response.data.status) {
+        console.log("cookie csrf",response.data.csrf,response.data )
+        cookie.set("csrf", response.data.csrf)
         return res
           .status(response.data.status)
           .send({ message: response.data.msg });
