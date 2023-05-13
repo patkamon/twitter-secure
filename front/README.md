@@ -4,7 +4,7 @@ Tavitter is a web application inspired by Twitter that offers a simplified versi
 
 ## Setup .env for development
 
-Create `.env.local` file with this following code and place into the root folder
+Create `.env.local` file with this following code and place into the `front` folder
 
     NEXT_PUBLIC_TURNSTILE_SITE_KEY=your-key
     NEXT_PUBLIC_TURNSTILE_SECRET_KEY=your-key
