@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Head from "next/head";
+import { useSession } from "next-auth/react";
 import axios from "axios";
 
 import Navbar from "@/components/Navbar";
@@ -7,9 +8,9 @@ import PostTweet from "@/components/PostTweet";
 import TweetFeed from "@/components/TweetFeed";
 
 const Home = () => {
+  const { data: session } = useSession();
   let [tweets, setTweets] = useState([]);
   useEffect(() => {
-    // console.log(JSON.parse(sessionStorage.getItem("user") || "{}"));
     getAllTweet();
   }, []);
 
@@ -37,9 +38,9 @@ const Home = () => {
           <p className="text-xl font-semibold border-b w-full p-3">Home</p>
           <TweetFeed tweets={tweets} />
         </div>
-        <div className="pt-16">
+        {session && <div className="pt-16">
           <PostTweet />
-        </div>
+        </div>}
       </div>
     </>
   );

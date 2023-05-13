@@ -12,12 +12,10 @@ interface ReplyTweet {
 }
 
 interface Profile {
-  _id: string;
   name: string;
   desc: string;
   img: string;
   cover: string;
-  __v: number;
   username: string;
   userId: string;
 }
@@ -37,6 +35,8 @@ const ReTweet = (props: Props) => {
         .get(`/api/user/profile/${props.replyTweet.userId}`)
         .then((response) => {
           let profile = response.data.profile.pop();
+          delete profile.__v;
+          delete profile._id;
           profile["username"] = response.data.username;
           profile["userId"] = response.data._id;
           setUserProfile(profile);
@@ -66,7 +66,7 @@ const ReTweet = (props: Props) => {
     }
   }
 
-  function handleCallbackDeletePopup(popupData: Array<Object>) {
+  function handleCallbackDeletePopup(popupData: Object) {
     setDeletePopup(false);
   }
 
@@ -94,6 +94,7 @@ const ReTweet = (props: Props) => {
           title="Delete Taveet?"
           desc="This can't be undone and it will be removed from your profile and any accounts that have followed you."
           confirmButtonL="Delete"
+          hyperlink=""
           cancelButton={true}
           field={[]}
           callback={handleCallbackDeletePopup}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { useSession } from "next-auth/react";
 import axios from "axios";
 
 import Navbar from "@/components/Navbar";
@@ -9,12 +10,10 @@ import PostTweet from "@/components/PostTweet";
 import UserProfile from "@/components/UserProfile";
 
 interface Profile {
-  _id: string;
   name: string;
   desc: string;
   img: string;
   cover: string;
-  __v: number;
   username: string;
   userId: string;
 }
@@ -41,35 +40,43 @@ interface TweetProps {
 
 const UserPage = () => {
   const router = useRouter();
+  const { data: session } = useSession();
   let [userProfile, setUserProfile] = useState<Profile>();
   let [tweets, setTweets] = useState<Array<TweetProps>>();
-  let [login, setLogin] = useState(false);
 
   useEffect(() => {
     async function getUserProfile() {
-      let user = JSON.parse(sessionStorage.getItem("user") || "{}");
       await axios
         .get(`/api/user/profile/${router.query.userId}`)
         .then((response) => {
           let profile = response.data.profile.pop();
-          profile["username"] = response.data.username;
-          profile["userId"] = response.data._id;
-          setUserProfile(profile);
-          if (user.id == response.data._id) {
-            getTweets();
+          if (profile) {
+            delete profile.__v;
+            delete profile._id;
+            profile["username"] = response.data.username;
+            profile["userId"] = response.data._id;
+            setUserProfile(profile);
+            if (session?.user.id == response.data._id) {
+              getTweets();
+            }
+          } else {
+            router.replace("/");
           }
         })
         .catch((error) => {
           console.log(error);
-          window.alert(error.response?.data.message);
+          if(window.sessionStorage.getItem("profile")) {
+            setUserProfile(JSON.parse(window.sessionStorage.getItem("profile") || "{}"));
+          } else {
+            router.replace("/");
+          }
         });
     }
     async function getTweets() {
-      let user = JSON.parse(sessionStorage.getItem("user") || "{}");
       await axios
         .get("/api/tweet/", {
           headers: {
-            Authorization: "Bearer " + user.token,
+            Authorization: "Bearer " + session?.user.accessToken,
           },
         })
         .then((response) => {
@@ -83,10 +90,7 @@ const UserPage = () => {
     if (router.isReady) {
       getUserProfile();
     }
-    if (sessionStorage.getItem("user") != null) {
-      setLogin(true);
-    }
-  }, [router.isReady]);
+  }, [router.isReady, session]);
 
   return (
     <>
@@ -104,7 +108,7 @@ const UserPage = () => {
             <TweetFeed key={tweet._id} tweets={[tweet]} />
           ))}
         </div>
-        {login && (
+        {session && (
           <div className="pt-16">
             <PostTweet />
           </div>

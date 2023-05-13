@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -9,19 +8,12 @@ export default async function handler(
   if (req.method == "POST") {
     try {
       const response = await axios.post(
-        "http://secure-proj_nginx-proxy_1:80/user/login",
-        req.body
+        "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+        { secret: process.env.NEXT_PUBLIC_TURNSTILE_SECRET_KEY, response: req.body.token }
       );
-      if (response.data.status) {
-
-     
-        return res
-          .status(response.data.status)
-          .send({ message: response.data.msg });
-      }
       return res.status(200).json(response.data);
     } catch (error) {
-      return res.status(502).send({ message: "invalid username or password" });
+      return res.status(502).send(error);
     }
   } else {
     return res.status(405).send({ message: "Method Not Allowed" });

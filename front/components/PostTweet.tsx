@@ -1,26 +1,20 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 import axios from "axios";
 
-type Profile = {
-  _id: string;
+interface Profile {
   name: string;
   desc: string;
   img: string;
   cover: string;
-  __v: number;
-};
-
-type User = {
-  id: string;
-  profile?: Profile;
-  token: string;
-  username?: string;
-};
+  username: string;
+}
 
 const PostTweet = () => {
   const router = useRouter();
-  let [user, setUser] = useState<User>();
+  const { data: session } = useSession();
+  let [profile, setProfile] = useState<Profile>();
   let [inputData, setInputData] = useState({
     msg: "",
     photo: [],
@@ -28,8 +22,8 @@ const PostTweet = () => {
   });
 
   useEffect(() => {
-    if (sessionStorage.getItem("user") != null) {
-      setUser(JSON.parse(window.sessionStorage.getItem("user") || "{}"));
+    if (sessionStorage.getItem("profile")) {
+      setProfile(JSON.parse(window.sessionStorage.getItem("profile") || "{}"));
     }
   }, []);
 
@@ -38,11 +32,11 @@ const PostTweet = () => {
     await axios
       .post("/api/tweet", inputData, {
         headers: {
-          Authorization: "Bearer " + user?.token,
+          Authorization: "Bearer " + session?.user.accessToken,
         },
       })
       .then((response) => {
-        router.reload();
+        router.replace("/user/" + session?.user.id).then(() => router.reload());
       })
       .catch((error) => {
         console.log(error);
@@ -71,19 +65,19 @@ const PostTweet = () => {
 
   return (
     <>
-      {user && (
+      {profile && (
         <div className="fixed w-[23%] bg-white drop-shadow-xl rounded-xl mx-5 hidden xl:grid max-h-[90%] overflow-auto">
           <div className="m-4 grid grid-cols-1">
             <img
               className="row-span-2 col-end-1 row-end-1 w-[48px] aspect-[1/1] object-cover rounded-full"
-              src={user.profile?.img}
+              src={profile.img}
             />
-            <p className="pl-4 my-auto text-xl">{user.profile?.name}</p>
+            <p className="pl-4 my-auto text-xl">{profile.name}</p>
             <a
-              href={"../user/" + user.id}
+              href={"../user/" + session?.user.id}
               className="pl-4 my-auto text-sm text-dark-gray hover:text-app-red"
             >
-              {"@" + user.username}
+              {"@" + profile.username}
             </a>
           </div>
           <form onSubmit={handleSubmit} className="row-span-4">

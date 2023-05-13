@@ -1,80 +1,102 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useSession, signOut } from "next-auth/react";
 import axios from "axios";
 
 import PopupForm from "./PopupForm";
 import Auth from "./Auth";
 import PopupBio from "./PopupBio";
 
-type Profile = {
-  _id: string;
+interface Profile {
   name: string;
   desc: string;
   img: string;
   cover: string;
-  __v: number;
-};
-
-type User = {
-  id: string;
-  profile?: Profile;
-  token: string;
-  username?: string;
-};
+  username: string;
+}
 
 const Navbar = () => {
   const router = useRouter();
-  let [user, setUser] = useState<User>();
+  const { data: session } = useSession();
+  let [profile, setProfile] = useState<Profile>();
   let [selectNav, setSelectNav] = useState(false);
   let [logoutPopup, setLogoutPopup] = useState(false);
   let [editPopup, setEditPopup] = useState(false);
   let [searchText, setSearchText] = useState("");
 
   useEffect(() => {
-    if (sessionStorage.getItem("user") != null) {
-      setUser(JSON.parse(window.sessionStorage.getItem("user") || "{}"));
+    if (sessionStorage.getItem("profile")) {
+      if (session) {
+        setProfile(JSON.parse(window.sessionStorage.getItem("profile") || "{}"))
+      } else if (session === null) {
+        sessionStorage.clear()
+      }
+    } else if (session) {
+      getUserProfile();
     }
-  }, []);
+  }, [session]);
 
   async function getUserProfile() {
-    await axios
-      .get("/api/user/profile", {
-        headers: {
-          Authorization: "Bearer " + user?.token,
-        },
-      })
-      .then((response) => {
-        (user as any)["profile"] = response.data.profile.pop();
-        (user as any)["username"] = response.data.username;
-        sessionStorage.setItem("user", JSON.stringify(user));
-        router.reload();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    if (session?.user.image && session?.user.name) {
+      const profile = {
+        name: session.user.name,
+        desc: "",
+        img: session.user.image,
+        cover: "/cover.png",
+        username: session.user.name!.replace(/\s+/g, ""),
+      };
+      setProfile(profile);
+      sessionStorage.setItem("profile", JSON.stringify(profile));
+    } else {
+      await axios
+        .get("/api/user/profile", {
+          headers: {
+            Authorization: ("Bearer " + session?.user.accessToken) as string,
+          },
+        })
+        .then((response) => {
+          let profile = response.data.profile.pop();
+          if (profile) {
+            delete profile.__v;
+            delete profile._id;
+            (profile as any)["username"] = response.data.username;
+            sessionStorage.setItem("profile", JSON.stringify(profile));
+            setProfile(profile);
+          } else {
+            setEditPopup(true);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }
 
-  function handleCallbackLogoutPopup(popupData: Array<Object>) {
+  function handleCallbackLogoutPopup(popupData: Object) {
     setLogoutPopup(false);
     setSelectNav(false);
     if (popupData) {
       sessionStorage.clear();
-      router.reload();
+      signOut();
+      router.replace("/").then(() => router.reload());
     }
   }
 
-  async function handleCallbackEditPopup(popupData: Array<Object>) {
+  async function handleCallbackEditPopup(popupData: Object) {
     if (popupData) {
       await axios
         .post("/api/user/profile", popupData, {
           headers: {
-            Authorization: "Bearer " + user?.token,
+            Authorization: "Bearer " + session?.user.accessToken,
           },
         })
         .then((response) => {
           setEditPopup(false);
           setSelectNav(false);
-          getUserProfile();
+          sessionStorage.clear();
+          router
+            .replace("/user/" + session?.user.id)
+            .then(() => router.reload());
         })
         .catch((error) => {
           console.log(error);
@@ -98,7 +120,7 @@ const Navbar = () => {
   function handleSelect(type: string, event: React.MouseEvent<HTMLElement>) {
     event.stopPropagation();
     if (type == "profile") {
-      router.push(`/user/${user?.id}`);
+      router.push(`/user/${session?.user.id}`);
     } else if (type == "logout") {
       setLogoutPopup(true);
     } else if (type == "edit") {
@@ -123,27 +145,29 @@ const Navbar = () => {
             required
           /> */}
         </form>
-        {user ? (
+        {session ? (
           <>
             <button
               onClick={(e) => setSelectNav(!selectNav)}
               className="text-l font-semibold bg-white text-app-red m-auto border py-1 px-2 rounded-md hover:bg-light-gray"
             >
-              {user?.profile ? user.profile.name : "Create Profile"}
+              {profile?.name ? profile.name : "Create Profile"}
             </button>
             {selectNav && (
               <div className="fixed grid w-1/12 top-12 right-5 bg-white rounded shadow-lg">
-                <button
-                  onClick={(e) => handleSelect("profile", e)}
-                  className="hover:bg-light-gray p-1 border-b text-left"
-                >
-                  Profile
-                </button>
+                {profile && (
+                  <button
+                    onClick={(e) => handleSelect("profile", e)}
+                    className="hover:bg-light-gray p-1 border-b text-left"
+                  >
+                    Profile
+                  </button>
+                )}
                 <button
                   onClick={(e) => handleSelect("edit", e)}
                   className="hover:bg-light-gray p-1 border-b text-left"
                 >
-                  Edit Profile
+                  {profile ? "Edit Profile" : "Create Profile"}
                 </button>
                 <button
                   onClick={(e) => handleSelect("logout", e)}
@@ -163,6 +187,7 @@ const Navbar = () => {
           title="Log out of Tavitter?"
           desc="You can always log back in at any time."
           confirmButtonL="Log out"
+          hyperlink=""
           cancelButton={true}
           field={[]}
           callback={handleCallbackLogoutPopup}
@@ -170,9 +195,9 @@ const Navbar = () => {
       )}
       {editPopup && (
         <PopupBio
-          title="Edit profile"
-          desc=""
-          cancelButton={true}
+          title={profile ? "Edit Profile" : "Create Profile"}
+          desc={profile ? "" : "Step 2 of 2"}
+          cancelButton={profile ? true : false}
           callback={handleCallbackEditPopup}
         />
       )}

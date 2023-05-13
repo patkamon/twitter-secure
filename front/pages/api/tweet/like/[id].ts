@@ -8,7 +8,7 @@ export default async function handler(
   const { id } = req.query;
   if (req.method == "PUT") {
     try {
-      const response = await axios.put(`http://secure-proj_nginx-proxy_1:80//tweet/like/${id}`, req.body,  {
+      const response = await axios.put(`http://secure-proj_nginx-proxy_1:80/tweet/like/${id}`, req.body,  {
         headers: {
           Authorization: req.headers.authorization,
         },

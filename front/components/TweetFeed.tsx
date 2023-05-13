@@ -28,7 +28,9 @@ interface Props {
 const TweetFeed = (props: Props) => {
   return (
     <>
-      {props.tweets.map((tweet) => <Tweet key={tweet._id} tweet={tweet} />)}
+      {props.tweets.map((tweet) => (
+        <Tweet key={tweet._id} tweet={tweet} />
+      ))}
     </>
   );
 };

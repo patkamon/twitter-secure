@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { useSession } from "next-auth/react";
 import axios from "axios";
 
 import Navbar from "@/components/Navbar";
@@ -30,9 +31,9 @@ interface TweetProps {
 
 const TweetPage = () => {
   const router = useRouter();
+  const { data: session } = useSession();
   let [tweet, setTweets] = useState<Array<TweetProps>>();
   let [replyText, setReplyText] = useState("");
-  let [login, setLogin] = useState(false);
 
   useEffect(() => {
     async function getAllTweet() {
@@ -40,7 +41,7 @@ const TweetPage = () => {
         .get(`/api/tweet/id/${router.query.tweetId}`)
         .then((response) => {
           if (response.data.length == 0) {
-            router.replace("/");
+            router.replace("/").then(() => router.reload());
           } else {
             setTweets(response.data);
           }
@@ -53,9 +54,6 @@ const TweetPage = () => {
     if (router.isReady) {
       getAllTweet();
     }
-    if (sessionStorage.getItem("user") != null) {
-      setLogin(true);
-    }
   }, [router.isReady]);
 
   async function handleSubmit(event: React.SyntheticEvent) {
@@ -67,7 +65,7 @@ const TweetPage = () => {
         { msg: replyText },
         {
           headers: {
-            Authorization: "Bearer " + user.token,
+            Authorization: "Bearer " + session?.user.accessToken,
           },
         }
       )
@@ -76,7 +74,6 @@ const TweetPage = () => {
       })
       .catch((error) => {
         console.log(error);
-
         window.alert(error.response.data.message);
       });
   }
@@ -93,16 +90,14 @@ const TweetPage = () => {
         <div className="pt-16"></div>
         <div className="pt-12 bg-white col-span-2 border border-light-gray">
           {tweet && <Tweet tweet={tweet[0]} />}
-          {login && (
+          {session && (
             <form
               onSubmit={handleSubmit}
               className="flex gap-4 border-b p-3 h-fit"
             >
               <img
                 className="flex-none h-[48px] aspect-[1/1] object-cover rounded-full"
-                src={
-                  JSON.parse(sessionStorage.getItem("user") || "{}").profile.img
-                }
+                src={JSON.parse(sessionStorage.getItem("profile") || "{}").img}
               />
               <textarea
                 className="flex-1 h-full w-full resize-none outline-none"
@@ -121,7 +116,7 @@ const TweetPage = () => {
           )}
           {tweet && <ReplyTweetFeed replyTweets={tweet[0].comment} />}
         </div>
-        {login && (
+        {session && (
           <div className="pt-16">
             <PostTweet />
           </div>

@@ -1,10 +1,8 @@
 interface Profile {
-  _id: string;
   name: string;
   desc: string;
   img: string;
   cover: string;
-  __v: number;
   username: string;
   userId: string;
 }

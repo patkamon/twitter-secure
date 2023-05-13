@@ -17,8 +17,8 @@ const PopupBio = (props: Props) => {
   });
 
   useEffect(() => {
-    let profile = JSON.parse(sessionStorage.getItem("user") || "{}").profile;
-    if (profile) {
+    let profile = JSON.parse(sessionStorage.getItem("profile") || "{}");
+    if (Object.keys(profile).length > 0) {
       setInputData({
         img: profile.img,
         cover: profile.cover,
@@ -64,7 +64,7 @@ const PopupBio = (props: Props) => {
         <div className="w-full py-2">
           {inputData.cover && (
             <img
-              className="aspect-[3/1] object-cover rounded-t-md"
+              className="aspect-[3/1] object-cover w-full rounded-t-md"
               src={inputData.cover}
             />
           )}

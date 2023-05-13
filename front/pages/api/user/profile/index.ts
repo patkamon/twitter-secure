@@ -31,7 +31,6 @@ export default async function handler(
       const response = await axios.get("http://secure-proj_nginx-proxy_1:80/user/profile", {
         headers: {
           Authorization: req.headers.authorization,
-          csrf: req.headers.csrf
         },
       });
       if (response.data.status) {
