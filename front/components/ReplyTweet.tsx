@@ -53,19 +53,6 @@ const ReTweet = (props: Props) => {
     return [d[1] + " " + d[2] + ", " + d[3]];
   }
 
-  function handleSelect(type: string, event: React.MouseEvent<HTMLElement>) {
-    event.stopPropagation();
-    if (type == "user") {
-      router.push(`/user/${userProfile?.userId}`);
-    } else if (type == "like") {
-      alert("liked");
-    } else if (type == "retweet") {
-      alert("retaveet");
-    } else if (type == "delete") {
-      setDeletePopup(true);
-    }
-  }
-
   function handleCallbackDeletePopup(popupData: Object) {
     setDeletePopup(false);
   }
@@ -79,10 +66,7 @@ const ReTweet = (props: Props) => {
         />
         <div className="row-start-2 flex items-center">
           <p className="mr-2 font-semibold">{userProfile?.name}</p>
-          <div
-            className="mr-2 text-dark-gray hover:cursor-pointer hover:text-app-red"
-            onClick={(e) => handleSelect("user", e)}
-          >
+          <div className="mr-2 text-dark-gray hover:cursor-pointer hover:text-app-red">
             {"@" + userProfile?.username}
           </div>
           <p className="text-dark-gray">{"· " + formatDate()}</p>

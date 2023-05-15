@@ -3,44 +3,8 @@ import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 
-interface User {
-  id: string;
-  token: string;
-  csrf: string;
-}
 
-interface Token {
-  id: string;
-  accessToken: string;
-  csrf: string;
-}
-
-interface Session {
-  user: Token;
-}
-
-// async function getUserProfile(token: String) {
-//   try {
-//     const response = await axios.get("http://twitter-secure-nginx-proxy-1:80/user/profile", {
-//       headers: {
-//         Authorization: ("Bearer " + token) as string,
-//       },
-//     });
-//     if (response.data.status) {
-//       throw new Error(response.data.msg);
-//     }
-//     let profile = response.data.profile.pop();
-//     delete profile.__v;
-//     delete profile._id;
-//     return profile;
-//   } catch (error) {
-//     if (error instanceof Error) {
-//       throw new Error(error.message);
-//     }
-//   }
-// }
-
-export const authOptions: NextAuthOptions = {
+export const authOptions = {
   providers: [
     CredentialsProvider({
       id: "tavitter-login",
@@ -75,6 +39,7 @@ export const authOptions: NextAuthOptions = {
           email: req.body?.email,
           password: req.body?.password,
           phone: req.body?.phone,
+          role: 'user',
         };
         try {
           const response = await axios.post(
@@ -93,8 +58,8 @@ export const authOptions: NextAuthOptions = {
       },
     }),
     GithubProvider({
-      clientId: process.env.NEXT_PUBLIC_GITHUB_ID!,
-      clientSecret: process.env.NEXT_PUBLIC_GITHUB_SECRET!,
+      clientId: process.env.NEXT_PUBLIC_GITHUB_ID,
+      clientSecret: process.env.NEXT_PUBLIC_GITHUB_SECRET,
     }),
   ],
   session: {
@@ -102,20 +67,20 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
-    async session({ session, token }: { session: Session; token: Token }) {
+    async session({ session, token }) {
       session.user.id = token.id;
       session.user.accessToken = token.accessToken;
       session.user.csrf = token.csrf;
       return session;
     },
-    async jwt({token, user, account}: {token: Token; user: User; account: Account;}) {
+    async jwt({token, user, account}) {
       if (user) {
         token.id = user.id;
         token.accessToken = user.token;
         token.csrf = user.csrf;
       }
       if (account?.provider == "github") {
-        token.accessToken = account.access_token!;
+        token.accessToken = account.access_token;
       }
       return token;
     },

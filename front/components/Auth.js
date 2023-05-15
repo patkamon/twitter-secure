@@ -5,21 +5,13 @@ import { signIn } from "next-auth/react";
 import PopupForm from "./PopupForm";
 import PopupAuth from "./PopupAuth";
 
-interface inputCreateAcc {
-  username: string;
-  email: string;
-  password: string;
-  confirm?: string;
-  phone: string;
-}
-
 const Auth = () => {
   const router = useRouter();
   let [logInPopup, setLogInPopup] = useState(false);
   let [createAccPopup, setCreateAccPopup] = useState(false);
   let [createConsent, setCreateConsent] = useState(false);
 
-  async function handleCallbackLogIn(popupData: Object) {
+  async function handleCallbackLogIn(popupData) {
     if (popupData) {
       signIn("tavitter-login", { ...popupData, redirect: false }).then(
         ({ ok, error }) => {
@@ -27,8 +19,7 @@ const Auth = () => {
             setLogInPopup(false);
             router.reload();
           } else {
-            console.log(error);
-            alert(error.message);
+            alert(error);
           }
         }
       );
@@ -37,7 +28,7 @@ const Auth = () => {
     }
   }
 
-  async function handleCallbackCreateAcc(popupData: inputCreateAcc) {
+  async function handleCallbackCreateAcc(popupData) {
     if (popupData) {
       if (popupData.password != popupData.confirm) {
         alert("Password do not match");
@@ -49,8 +40,7 @@ const Auth = () => {
               setCreateAccPopup(false);
               router.reload();
             } else {
-              console.log(error);
-              alert(error.message);
+              alert(error);
             }
           }
         );
@@ -60,7 +50,7 @@ const Auth = () => {
     }
   }
 
-  function handleCallbackCreateCon(popupData: Object) {
+  function handleCallbackCreateCon(popupData) {
     if (popupData) {
       setCreateAccPopup(true);
     }
