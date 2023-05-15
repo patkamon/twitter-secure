@@ -19,7 +19,7 @@ interface Session {
 
 // async function getUserProfile(token: String) {
 //   try {
-//     const response = await axios.get("http://secure-proj_nginx-proxy_1:80/user/profile", {
+//     const response = await axios.get("http://twitter-secure-nginx-proxy-1:80/user/profile", {
 //       headers: {
 //         Authorization: ("Bearer " + token) as string,
 //       },
@@ -51,7 +51,7 @@ export const authOptions: NextAuthOptions = {
         };
         try {
           const response = await axios.post(
-            "http://secure-proj_nginx-proxy_1:80/user/login",
+            "http://twitter-secure-nginx-proxy-1:80/user/login",
             data
           );
           if (response.data.status) {
@@ -76,7 +76,7 @@ export const authOptions: NextAuthOptions = {
         };
         try {
           const response = await axios.post(
-            "http://secure-proj_nginx-proxy_1:80/user/signup",
+            "http://twitter-secure-nginx-proxy-1:80/user/signup",
             data
           );
           if (response.data.status) {

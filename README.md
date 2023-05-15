@@ -17,5 +17,5 @@ BACKEND MAIN PORT IS localhost:80
 FRONTEND ON PORT 3000.   
 NOTE 1 Made sure container are same as this list 
 ![alt text](https://github.com/patkamon/twitter-secure/blob/main/containers.png).  
-NOTE 2 Made sure there are container name `secure-proj_nginx-proxy_1` else you have to replace it with your container name. I recommend you use visual studio code for replaces like in this pic.
+NOTE 2 Made sure there are container name `twitter-secure-nginx-proxy-1` else you have to replace it with your container name. I recommend you use visual studio code for replaces like in this pic.
 ![alt text](https://github.com/patkamon/twitter-secure/blob/main/change-name.png). 

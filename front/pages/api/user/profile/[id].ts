@@ -9,7 +9,7 @@ export default async function handler(
   if (req.method == "GET") {
     try {
       const response = await axios.get(
-        `http://secure-proj_nginx-proxy_1:80/user/profile/id/${id}`
+        `http://twitter-secure-nginx-proxy-1:80/user/profile/id/${id}`
       );
       return res.status(200).json(response.data);
     } catch (error) {

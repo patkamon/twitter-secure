@@ -8,7 +8,7 @@ export default async function handler(
   if (req.method == "POST") {
     try {
       const response = await axios.post(
-        "http://secure-proj_nginx-proxy_1:80/tweet/",
+        "http://twitter-secure-nginx-proxy-1:80/tweet/",
         req.body,
         {
           headers: {
@@ -28,7 +28,7 @@ export default async function handler(
     }
   } else if (req.method == "GET") {
     try {
-      const response = await axios.get("http://secure-proj_nginx-proxy_1:80/tweet/", {
+      const response = await axios.get("http://twitter-secure-nginx-proxy-1:80/tweet/", {
         headers: {
           Authorization: req.headers.authorization,
         },

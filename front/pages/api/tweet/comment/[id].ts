@@ -9,7 +9,7 @@ export default async function handler(
   if (req.method == "PUT") {
     try {
       const response = await axios.put(
-        `http://secure-proj_nginx-proxy_1:80/tweet/comment/${id}`,
+        `http://twitter-secure-nginx-proxy-1:80/tweet/comment/${id}`,
         req.body,
         {
           headers: {
