@@ -11,6 +11,7 @@ export default async function handler(
       const response = await axios.put(`http://twitter-secure-nginx-proxy-1:80/tweet/like/${id}`, req.body,  {
         headers: {
           Authorization: req.headers.authorization,
+          csrf: req.headers.csrf,
         },
       });
       return res.status(200).json(response.data);

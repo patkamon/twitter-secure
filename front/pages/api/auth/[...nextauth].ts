@@ -6,11 +6,13 @@ import axios from "axios";
 interface User {
   id: string;
   token: string;
+  csrf: string;
 }
 
 interface Token {
   id: string;
   accessToken: string;
+  csrf: string;
 }
 
 interface Session {
@@ -103,12 +105,14 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }: { session: Session; token: Token }) {
       session.user.id = token.id;
       session.user.accessToken = token.accessToken;
+      session.user.csrf = token.csrf;
       return session;
     },
     async jwt({token, user, account}: {token: Token; user: User; account: Account;}) {
       if (user) {
         token.id = user.id;
         token.accessToken = user.token;
+        token.csrf = user.csrf;
       }
       if (account?.provider == "github") {
         token.accessToken = account.access_token!;

@@ -13,6 +13,7 @@ export default async function handler(
         {
           headers: {
             Authorization: req.headers.authorization,
+            csrf: req.headers.csrf,
           },
         }
       );
@@ -31,6 +32,7 @@ export default async function handler(
       const response = await axios.get("http://twitter-secure-nginx-proxy-1:80/tweet/", {
         headers: {
           Authorization: req.headers.authorization,
+          csrf: req.headers.csrf,
         },
       });
       if (response.data.status) {

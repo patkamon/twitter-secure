@@ -14,6 +14,7 @@ export default async function handler(
         {
           headers: {
             Authorization: req.headers.authorization,
+            csrf: req.headers.csrf,
           },
         }
       );

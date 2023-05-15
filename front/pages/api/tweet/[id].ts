@@ -11,6 +11,7 @@ export default async function handler(
       const response = await axios.delete(`http://twitter-secure-nginx-proxy-1:80/tweet/${id}`, {
         headers: {
           Authorization: req.headers.authorization,
+          csrf: req.headers.csrf,
         },
       });
       if (response.data.status) {

@@ -123,6 +123,7 @@ const Tweet = (props: Props) => {
         .delete(`/api/tweet/${props.tweet._id}`, {
           headers: {
             Authorization: "Bearer " + session?.user.accessToken,
+            csrf: session?.user.csrf as string,
           },
         })
         .then((response) => {
@@ -142,6 +143,7 @@ const Tweet = (props: Props) => {
       .put(`/api/tweet/like/${props.tweet._id}`, null, {
         headers: {
           Authorization: "Bearer " + session?.user.accessToken,
+          csrf: session?.user.csrf as string,
         },
       })
       .then((response) => {

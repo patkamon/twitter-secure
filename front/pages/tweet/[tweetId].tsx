@@ -66,6 +66,7 @@ const TweetPage = () => {
         {
           headers: {
             Authorization: "Bearer " + session?.user.accessToken,
+            csrf: session?.user.csrf as string,
           },
         }
       )

@@ -33,6 +33,7 @@ const PostTweet = () => {
       .post("/api/tweet", inputData, {
         headers: {
           Authorization: "Bearer " + session?.user.accessToken,
+          csrf: session?.user.csrf as string,
         },
       })
       .then((response) => {

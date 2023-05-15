@@ -52,6 +52,7 @@ const Navbar = () => {
         .get("/api/user/profile", {
           headers: {
             Authorization: ("Bearer " + session?.user.accessToken) as string,
+            csrf: session?.user.csrf as string,
           },
         })
         .then((response) => {
@@ -88,6 +89,7 @@ const Navbar = () => {
         .post("/api/user/profile", popupData, {
           headers: {
             Authorization: "Bearer " + session?.user.accessToken,
+            csrf: session?.user.csrf as string,
           },
         })
         .then((response) => {
